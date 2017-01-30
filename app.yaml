@@ -1,17 +1,17 @@
 runtime: python27
-env: static
-entrypoint: gunicorn -b :$PORT main:app
-threadsafe: yes
-api_version: 2
-service: khet-services
-
+api_version: 1
+threadsafe: true
 
 handlers:
 - url: /.*
   script: main.app
 
-
 #[START env]
 env_variables:
-    CLOUD_STORAGE_BUCKET: khet-online-storage-prod
+    CLOUD_STORAGE_BUCKET: khet-online-storage
 #[END env]
+
+skip_files:
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/env/.*$
+- ^(.*/)?\..*$
