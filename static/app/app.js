@@ -289,7 +289,7 @@ app.controller('CreateCtrl', function CreateCtrl(khetService, $window, $timeout,
         });
     };
 
-    //TODO: I made that bitch famous
+
     ctrl.joinGame = function(){
         var id = ctrl.gameID;
         if (id > 0){
