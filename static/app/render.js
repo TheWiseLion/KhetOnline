@@ -29,7 +29,7 @@ angular.module('myApp').controller('GameController', function($scope,$window,$in
     var eye = new createjs.Bitmap(base+"horuseye.png");
     var scarab = new createjs.Bitmap(base+"scarab.png");
     var scarabStatic = new createjs.Bitmap(base+"scarabStatic.png");
-    var sphinx = new createjs.Bitmap(base+"sphinxSquare.png");
+    var sphinx = new createjs.Bitmap(base+"SphinxSquare.png");
     var sphinxFace = new createjs.Bitmap(base+"SphinxIcon.png");
     var pyramid = new createjs.Bitmap(base+"pyramid.png");
     var counterClockwise = new createjs.Bitmap(base+"counterclockwise.png");
