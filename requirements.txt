@@ -31,3 +31,4 @@ uritemplate==0.6
 wheel==0.24.0
 google-api-python-client
 ndb
+google-cloud-datastore

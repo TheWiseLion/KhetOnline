@@ -2,9 +2,12 @@ import uuid
 from abc import ABCMeta, abstractmethod
 
 import datetime
+# Support Local Static &
+try:
+    from google.appengine.ext import ndb
+except:
+    import ndb
 
-# import ndb
-from google.appengine.ext import ndb
 from  flask_restplus import abort
 from pykhet.components.board import KhetBoard
 from pykhet.components.types import TeamColor, Move, Position, Piece, MoveType
