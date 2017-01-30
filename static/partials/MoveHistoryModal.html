@@ -1,0 +1,30 @@
+<md-dialog>
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 style="text-align: center;margin-left: auto;margin-right: auto;">- Move History -</h2>
+
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <label style="text-align: center;margin-left: auto;margin-right: auto;">Moves</label>
+                <md-content flex layout-padding>
+                    <p ng-repeat="event in events">
+                        {{event.player.capitalizeFirstLetter()}} {{event.type}}
+                        <b ng-if="event.type=='played' && event.value.type == 'MOVE'">moved {{event.value.position.x+1}},{{event.value.position.y+1}} to {{event.value.value.position.x+1}},{{event.value.value.position.y+1}}</b>
+                        <b ng-if="event.type=='played' && event.value.type == 'ROTATE'">rotated {{event.value.position.x+1}},{{event.value.position.y+1}} to {{event.value.value}} degrees</b>
+                        <b ng-if="event.type == 'destroyed'">{{event.value.piece.color}} {{event.value.piece.type}} at {{event.value.position.x+1}},{{event.value.position.y+1}}</b>
+
+                    </p>
+                </md-content>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <button type="button" class="btn" ng-click="cancel()">Close</button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>
+

@@ -1,0 +1,131 @@
+<h1>Create Game</h1>
+<form style="font-size: 1.5rem">
+    <div class="form-group row">
+        <label class="col-4 col-form-label">Name (optional)</label>
+        <div class="col-8">
+            <input class="form-control" type="text" ng-model="ctrl.name">
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-4 col-form-label">Opponent</label>
+        <div class="btn-group col-8" role="group">
+            <button type="button" class="btn" ng-class="{true:'btn-success', false:'btn-default'}[ctrl.opponent=='human']"
+            ng-click="ctrl.opponent='human'">Human <i class="fa fa-user" aria-hidden="true"></i></button>
+            <button type="button" class="btn"
+                    ng-click="ctrl.opponent='ai'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.opponent=='ai']">Computer <i class="fa fa-laptop" aria-hidden="true"></i></button>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-4 col-form-label">Color</label>
+        <div class="btn-group col-8" role="group">
+            <button type="button" class="btn"
+                    ng-click="ctrl.color='silver'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.color=='silver']">Silver (1st)</button>
+            <button type="button" class="btn"
+                    ng-click="ctrl.color='red'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.color=='red']">Red (2nd)</button>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-4 col-form-label">Game Type</label>
+        <div class="btn-group col-8" role="group">
+            <button type="button" class="btn"
+                    ng-click="ctrl.mode='classic'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.mode=='classic']">Classic</button>
+            <button type="button" class="btn"
+                    ng-click="ctrl.mode='imhotep'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.mode=='imhotep']" disabled>Imhotep</button>
+            <button type="button" class="btn"
+                    ng-click="ctrl.mode='dynasty'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.mode=='dynasty']" disabled>Dynasty</button>
+        </div>
+    </div>
+
+    <div class="form-group row" ng-if="ctrl.opponent == 'human'">
+        <label class="col-4 col-form-label">Turn Time Limit</label>
+        <div class="col-8">
+            <div class="row">
+                <md-slider flex class="md-warn col-7"  min="30" max="300" step="30" ng-model="ctrl.turnTime" aria-label="red" id="red-slider">
+                </md-slider>
+                <div class="col-5">
+                    <label style="margin-top: auto; margin-left: 5px" ng-if="ctrl.turnTime <= 60">{{ctrl.turnTime}} Seconds</label>
+                    <label style="margin-top: auto; margin-left: 10px" ng-if="ctrl.turnTime > 60">{{ctrl.turnTime/60.0}} Minutes</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row" ng-if="ctrl.opponent == 'ai'">
+        <label class="col-4 col-form-label">Difficulty</label>
+        <div class="btn-group col-8" role="group">
+            <button type="button" class="btn"
+                    ng-click="ctrl.level='cake'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.level=='cake']">Cake-Walk</button>
+            <button type="button" class="btn"
+                    ng-click="ctrl.level='easy'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.level=='easy']">Easy</button>
+            <button type="button" class="btn"
+                    ng-click="ctrl.level='medium'"
+                    ng-class="{true:'btn-success', false:'btn-default'}[ctrl.level=='medium']" disabled>Medium</button>
+        </div>
+    </div>
+
+</form>
+<div style="margin-left:55px">
+    <button type="button" class="btn btn-lg btn-primary" ng-click="ctrl.createGame()">Create Game</button>
+</div>
+<br><br><br><br>
+
+<span>
+    <h1>Find Game <md-button class="md-icon-button md-raised md-primary" aria-label="More" ng-click="ctrl.findGames()"><i class="fa fa-refresh" aria-hidden="true"></i></md-button></h1>
+
+</span>
+
+<p class="form-text text-muted">
+    Games below are waiting for a second player
+</p>
+
+<md-content flex layout-padding style="max-height: 400px; overflow: auto;  background: rgba(93, 87, 87, 0.71);">
+    <md-list flex>
+        <md-list-item class="md-3-line" ng-repeat="game in ctrl.pendingGames" ng-click="ctrl.joinExisting(game)">
+            <img src="static/img/horuseye.png" class="md-avatar" />
+            <div class="md-list-item-text" layout="column">
+                <h3 style="color: rgba(255, 255, 255, 0.87);">Name: {{ game.name }}</h3>
+                <h4 ng-if="game.timeLimit <= 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit }} seconds</h4>
+                <h4 ng-if="game.timeLimit > 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit/60.0 }} minutes</h4>
+                <p style="color: rgba(255, 255, 255, 0.87);">On Move {{ game.move }}</p>
+            </div>
+        </md-list-item>
+    </md-list>
+</md-content>
+
+
+<br><br>
+<span>
+    <h1>On Going Games <md-button class="md-icon-button md-raised md-primary" aria-label="More" ng-click="ctrl.findOnGoingGames()"><i class="fa fa-refresh" aria-hidden="true"></i></md-button></h1>
+
+</span>
+<p class="form-text text-muted">
+    Games below are currently in play
+</p>
+
+<md-content flex layout-padding style="max-height: 400px; overflow: auto; background: rgba(93, 87, 87, 0.71);">
+    <md-list flex>
+        <md-list-item class="md-3-line" ng-repeat="game in ctrl.onGoingGames" ng-click="ctrl.joinExisting(game)">
+            <img src="static/img/ankh.png" class="md-avatar" />
+            <div class="md-list-item-text" layout="column">
+                <h3 style="color: rgba(255, 255, 255, 0.87);">Name: {{ game.name }}</h3>
+                <h4 ng-if="game.timeLimit <= 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit }} seconds</h4>
+                <h4 ng-if="game.timeLimit > 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit/60.0 }} minutes</h4>
+                <p style="color: rgba(255, 255, 255, 0.87);">On Move {{ game.move }}</p>
+            </div>
+        </md-list-item>
+    </md-list>
+</md-content>
+
+
+<br><br>

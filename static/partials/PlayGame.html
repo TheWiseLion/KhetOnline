@@ -1,0 +1,40 @@
+
+
+<!-- Add Waiting For Player Modal -->
+<!-- If not AI and events != 2 -->
+
+
+<div ng-if="!ctrl.gameOver && ctrl.gameStarted">
+    <h2>Moving Player: {{ctrl.game.movingPlayer.capitalizeFirstLetter()}}</h2>
+    <h2>Your Playing As: {{ctrl.side.capitalizeFirstLetter()}}</h2>
+    <h2>Time Left To Move:</h2>
+</div>
+
+<!--- Show only if already 'joined' -->
+
+<h3 style="text-align: center">- Move {{ctrl.moveIndex +1}} -</h3>
+<div ng-controller='GameController' >
+    <canvas id="gameCanvas" style="background-color:#FFF; display:block; margin-right: auto; margin-left: auto;"></canvas>
+</div>
+
+<!-- Left And Right Arrow For Previous States.... -->
+<div  style="margin: 0 auto; display: block; text-align:center;">
+    <h4 style="margin-bottom: 0;">-Previous Moves-</h4>
+    <span >
+        <md-button class="md-raised md-warn" ng-disabled="ctrl.moveIndex == 0" ng-click="ctrl.goBackMove()" aria-label="back">
+          <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        </md-button>
+        &nbsp;
+        <md-button class="md-raised md-warn" ng-disabled="ctrl.moveIndex == ctrl.game.events.length-1" ng-click="ctrl.goForwardMove()" aria-label="forward">
+          <i class="fa fa-arrow-right" aria-hidden="true"></i>
+        </md-button>
+    </span>
+
+</div>
+<div  style="margin: 0 auto; display: block; text-align:center;">
+    <md-button class="md-raised md-primary" ng-click="ctrl.moveLog()" style="font-size: large;">
+        &nbsp;&nbsp;&nbsp;<i class="fa fa-history fa-flip-horizontal" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Move Log&nbsp;&nbsp;&nbsp;<i class="fa fa-history" aria-hidden="true"></i>&nbsp;&nbsp;
+    </md-button>
+</div>
+<!-- Link To Next Game -->
+<br><br>

@@ -1,0 +1,23 @@
+<md-dialog aria-label="endModal">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 style="text-align: center;margin-left: auto;margin-right: auto;">- Game Over -</h2>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <label style="text-align: center;margin-left: auto;margin-right: auto;">{{winner.capitalizeFirstLetter()}} has won</label>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button type="button" class="md-raised" ng-click="cancel()">See Moves</md-button>
+            &nbsp;&nbsp;&nbsp;
+            <md-button type="button" class="md-raised md-primary" ng-if="nextGame==null && canCreate" ng-click="hide()">Create New Game</md-button>
+            <md-button type="button" class="md-raised md-primary" ng-if="nextGame!=null" ng-click="hide()">Next Game</md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>
+

@@ -1,0 +1,23 @@
+<md-dialog aria-label="moveModal">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Submitting Move...</h2>
+
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <label ng-if="opponentIsAI">AI is thinking about move...</label>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-progress-circular md-diameter="96" style="margin-left: auto;margin-right: auto;display: block;"></md-progress-circular>
+        </md-dialog-actions>
+    </form>
+</md-dialog>
+
+
+<!--<md-progress-circular ng-disabled="!vm.activated" md-diameter="96"></md-progress-circular>-->

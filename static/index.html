@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Cache For Up To One Day -->
+    <meta http-equiv="Cache-Control" content="public, max-age=86400" />
+    <link rel='shortcut icon' type='image/x-icon' href='static/favicon.ico' />
+
+
+    <title>Khet Online</title>
+    <!-- Angular Material requires Angular.js Libraries -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-animate.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-aria.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-cookies.min.js"></script>
+
+    <!-- Angular Material Library -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <script
+      src="http://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/46e04e603d.js"></script>
+
+
+    <!--<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>-->
+    <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+    <script src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
+    <script src="https://code.createjs.com/tweenjs-0.6.2.min.js"></script>
+    <script src="https://code.createjs.com/preloadjs-0.6.2.min.js"></script>
+    <script src="static/app/app.js"></script>
+    <script src="static/app/render.js"></script>
+
+    <link rel="stylesheet" href="static/main.css">
+
+</head>
+<body ng-app="myApp">
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse"
+style="font-size: 1.4em;">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarOptions" aria-controls="navbarOptions" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#!/games" style="font-size: 1.5em; font-family: pdark;">Khet Online</a>
+
+    <div class="collapse navbar-collapse pull-*-right"  id="navbarOptions">
+        <ul class="navbar-nav pull-*-right">
+            <li class="nav-item">
+                <a class="nav-link" href="#!/games">Games</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#!/about">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#!/how-to-play">How To Play</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid" >
+
+    <div class="row">
+        <!-- Disappears On Mobile, unsure why left and right are different sizes.. -->
+        <div class="container col-lg-2 hidden-lg-down">
+            <img src="static/img/AnubisLeft.png" class="pull-left" width="95%">
+        </div>
+
+        <div class="container col-lg-8" style="margin-top: 25px">
+            <div ng-view></div>
+        </div>
+
+        <!-- Disappears On Mobile, unsure why left and right are different sizes.. -->
+        <div class="container col-lg-2 hidden-lg-down">
+            <img src="static/img/AnubisRight.png" class="pull-right" width="95%">
+        </div>
+    </div>
+</div>
+
+
+<nav class="navbar navbar-inverse fixed-bottom bg-inverse" style="padding:20px 0 0 0; margin-bottom:0px; color:#FFF">
+
+
+
+</nav>
+</body>
+</html>

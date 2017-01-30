@@ -1,0 +1,81 @@
+@font-face {
+    font-family: aie;
+    src: url("fonts/aie.otf");
+}
+
+@font-face {
+    font-family: ovalEgyptian;
+    src: url("fonts/Oval_Egyptian.otf");
+}
+
+@font-face {
+    font-family: pdark;
+    src: url("fonts/pdark.ttf");
+}
+
+.container-fluid {
+    background-image: url("img/black-thread2x.png");
+    background-color: #0e0e0e;
+    background-repeat: repeat;
+    font-family: aie;
+    color: #fff;
+
+}
+
+body {
+    background-image: url("img/black-thread2x.png");
+    background-color: #0e0e0e;
+    background-repeat: repeat;
+    font-family: aie;
+    color: #fff;
+
+}
+
+.btn-group-justified {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate; }
+.btn-group-justified .btn,
+.btn-group-justified .btn-group {
+    float: none;
+    display: table-cell;
+    width: 1%; }
+.btn-group-justified .btn .btn,
+.btn-group-justified .btn-group .btn {
+    width: 100%; }
+.btn-group-justified .btn .dropdown-menu,
+.btn-group-justified .btn-group .dropdown-menu {
+    left: auto; }
+
+
+
+md-slider .md-track {
+    background-color: rgb(255, 251, 171);
+}
+
+md-slider.md-default-theme.md-min .md-focus-ring, md-slider.md-min .md-focus-ring {
+    background-color: rgba(255,171,145,0.38);
+}
+
+md-slider.md-min[md-discrete] .md-sign {
+    background-color: rgb(255,87,34);
+}
+
+.md-button.md-default-theme.md-raised[disabled], .md-button.md-raised[disabled], .md-button.md-default-theme.md-fab[disabled], .md-button.md-fab[disabled] {
+    background-color: rgb(218,218,218);
+}
+
+.text-muted {
+    color: #b7bbbd!important;
+}
+
+.tab {
+    margin-left: 50px;
+}
+
+.center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

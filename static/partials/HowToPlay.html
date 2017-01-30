@@ -1,0 +1,107 @@
+<h1>How to play Khet</h1>
+<div class="tab">
+    <p>Khet is a chess like variant where pieces are taken when hit by a laser on any of its flat sides </p>
+    <p>The game ends when a players pharaoh is taken</p>
+    <h4><a href ng-click="scrollTo('pieces')">Pieces</a></h4>
+    <div class="tab">
+        <h5><a href ng-click="scrollTo('sphinx')">Sphinx</a></h5>
+        <h5><a href ng-click="scrollTo('anubis')">Anubis</a></h5>
+        <h5><a href ng-click="scrollTo('pharaoh')">Pharaoh</a></h5>
+        <h5><a href ng-click="scrollTo('pyramid')">Pyramid</a></h5>
+        <h5><a href ng-click="scrollTo('scarab')">Scarab</a></h5>
+    </div>
+    <h4><a href ng-click="scrollTo('turn')">Taking Turns</a></h4>
+    <h4><a href ng-click="scrollTo('boards')">Boards</a></h4>
+</div>
+
+<br><br><br>
+
+
+<h2 id="pieces"><a href ng-click="scrollTo('pieces')">Pieces</a></h2>
+<div class="tab">
+    <h3 id="sphinx"><a href ng-click="scrollTo('sphinx')">Sphinx</a></h3>
+    <div class="tab">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-info"></i>Each player has one sphinx piece</li>
+            <li><i class="fa-li fa fa-info"></i>The sphinx produces laser light in the direction it's oriented</li>
+            <li><i class="fa-li fa fa-picture-o"></i>The sphinx cannot move to a different square and has two possible orientations</li>
+            <img class="tab" src="static/img/tutorial/SphinxMoves.png" />
+            <img class="tab" src="static/img/tutorial/SphinxMoves2.png" />
+            <li><i class="fa-li fa fa-picture-o"></i>The sphinx cannot be taken even if hit by a laser</li>
+            <img class="tab" src="static/img/tutorial/SphinxAlive.png" />
+        </ul>
+    </div>
+    <h3 id="anubis"><a href ng-click="scrollTo('anubis')">Anubis</a></h3>
+    <div class="tab">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-picture-o"></i>The piece can move to any unoccupied adjacent square</li>
+            <img class="tab" src="static/img/tutorial/AnubisMoves.png" />
+            <img class="tab" src="static/img/tutorial/AnubisMoves2.png" />
+            <li><i class="fa-li fa fa-picture-o"></i>The piece is not taken when the laser hits the patterned side of the piece</li>
+            <img class="tab" src="static/img/tutorial/AnubisFace.png" />
+            <img class="tab" src="static/img/tutorial/AnubisTaken.png" />
+        </ul>
+    </div>
+
+    <h3 id="pharaoh"><a href ng-click="scrollTo('pharaoh')">Pharaoh</a></h3>
+    <div class="tab">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-picture-o"></i>The piece can move to any unoccupied adjacent square</li>
+            <img class="tab" src="static/img/tutorial/PharaohMoves.png" />
+            <li><i class="fa-li fa fa-heartbeat"></i>The player loses if this piece is taken (equivalent to the king in chess)</li>
+        </ul>
+
+    </div>
+
+
+    <h3 id="pyramid"><a href ng-click="scrollTo('pyramid')">Pyramid</a></h3>
+    <div class="tab">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-picture-o"></i>The piece can move to any unoccupied adjacent square and can rotate</li>
+            <img class="tab" src="static/img/tutorial/PyramidMove.png" />
+            <li><i class="fa-li fa fa-picture-o"></i>Light bounces 90° if hit on the hypotenuse of the triangle</li>
+            <img class="tab" src="static/img/tutorial/PyramidBounce.png" />
+        </ul>
+    </div>
+
+    <h3 id="scarab"><a href ng-click="scrollTo('scarab')">Scarab</a></h3>
+    <div class="tab">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-picture-o"></i>The piece can move to any unoccupied adjacent square and can rotate</li>
+            <img class="tab" src="static/img/tutorial/ScarabMove.png" />
+
+            <li><i class="fa-li fa fa-picture-o"></i>The piece can swap spaces with any adjacent pyramid or anubis pieces</li>
+            <img class="tab" src="static/img/tutorial/ScarabMove2.png" />
+
+            <li><i class="fa-li fa fa-picture-o"></i>Light bounces 90° if hit</li>
+            <img class="tab" src="static/img/tutorial/ScarabBounce.png" />
+
+        </ul>
+    </div>
+
+
+</div>
+
+<br><br>
+
+<h2 id=""><a href ng-click="scrollTo('turn')">Taking a turn</a></h2>
+<div class="tab">
+    <ul class="fa-ul">
+        <li><i class="fa-li fa fa-info"></i>During a turn you can move a piece <b>or</b> rotate it 90° (for those pieces that rotate)</li>
+        <li><i class="fa-li fa fa-info"></i>At the end of the turn the moving colors sphinx will apply it's laser effect taking up to one piece based on the rules above</li>
+        <li><i class="fa-li fa fa-info"></i><b>Note</b>: This also means you can take your own pieces!</li>
+    </ul>
+</div>
+
+<br><br>
+
+<h2 id="boards"><a href ng-click="scrollTo('boards')">Boards</a></h2>
+<div class="tab">
+    <h3>Classic</h3>
+    <img class="tab" src="static/img/tutorial/board.png" />
+</div>
+
+<br><br>
+
+<h1 style="text-align: center;"><a href="#!/games">Now Go Play</a></h1>
+<br><br><br>
