@@ -5,7 +5,7 @@ import api.settings
 from flask import Flask, Blueprint
 from api.api import rest_api
 
-# Beanstalk looks for "application" variable
+# Google App Engine will look for this variable
 app = Flask(__name__)
 
 file_blueprint = Blueprint('static_files', __name__, url_prefix='/site')

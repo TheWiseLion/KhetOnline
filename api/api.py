@@ -55,7 +55,7 @@ create_game = rest_api.model('CreateGame', {
                                 max=60 * 60),
 
     'name': fields.String(required=False, description='summary for article'),
-    'aiLevel': fields.String(required=False, description='difficulty level', enum=[AILevel.cake, AILevel.easy],
+    'aiLevel': fields.String(required=False, description='difficulty level', enum=[AILevel.cake, AILevel.easy,AILevel.medium],
                              default=AILevel.cake),
     'previousGame': fields.String(required=False,
                                   description='Previous game to link to new game. If provided all other fields are ignored.')

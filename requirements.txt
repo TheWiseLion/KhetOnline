@@ -20,7 +20,7 @@ proto-google-datastore-v1beta3==0.0.3rc0
 protobuf==3.0.0a3
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
-pykhet==0.12
+pykhet==0.17
 python-dateutil==2.6.0
 pytz==2016.10
 rsa==3.4.2

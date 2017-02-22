@@ -3,10 +3,17 @@ from abc import ABCMeta, abstractmethod
 
 import datetime
 # Support Local Static &
+from pykhet.solvers.minmax import CMinMaxSolver
+
+_can_import_appengine = False
 try:
     from google.appengine.ext import ndb
+    _can_import = True
 except:
-    import ndb
+    try:
+        import ndb
+    except:
+        pass
 
 from  flask_restplus import abort
 from pykhet.components.board import KhetBoard
@@ -37,6 +44,9 @@ class EventType(Enum):
 class AILevel(object):
     cake = "cake"
     easy = "easy"
+    medium = "medium"
+    difficult = "difficult"
+    grand_master = "grand master"
 
 
 # Played, TeamColor, ISOTime, Move
@@ -220,9 +230,12 @@ class GameState(object):
     def move_as_ai(self, color):
         solver = None
         if self.ai_level == AILevel.cake:
-            solver = MinmaxSolver(max_evaluations=100)
-        else:
-            solver = MinmaxSolver(max_evaluations=1000)
+            solver = CMinMaxSolver(max_evaluations=100) #~= 1 move
+        elif self.ai_level == AILevel.easy:
+            solver = CMinMaxSolver(max_evaluations=100000)
+        elif self.ai_level == AILevel.medium:
+            solver = CMinMaxSolver(max_evaluations=200000)
+
 
         move = solver.get_move(self.board, color)
         return self.apply_move(move, color)
@@ -337,77 +350,82 @@ class RAMStore(GameStorage):
             abort("Offset Larger Than All Results")
         return lst[offset:min(offset + max_results, len(lst))], len(lst)
 
+try:
+    class GoogleGameStateStore(ndb.Model):
+        game_state = ndb.StringProperty()
+        game_data = ndb.JsonProperty()  # Potentially Useful To Compress...
 
-class GoogleGameStateStore(ndb.Model):
-    game_state = ndb.StringProperty()
-    game_data = ndb.JsonProperty()  # Potentially Useful To Compress...
+        @staticmethod
+        def from_game_state(game_state, game_id):
+            return GoogleGameStateStore(game_state=game_state.get_play_state(),
+                                        id=game_id,
+                                        game_data=game_state.to_dictionary())
 
-    @staticmethod
-    def from_game_state(game_state, game_id):
-        return GoogleGameStateStore(game_state=game_state.get_play_state(),
-                                    id=game_id,
-                                    game_data=game_state.to_dictionary())
-
-    def to_state(self):
-        return GameState.from_dictionary(self.game_data)
+        def to_state(self):
+            return GameState.from_dictionary(self.game_data)
 
 
-class GoogleDataStore(GameStorage):
-    """
-    Storage That Uses Google Data Store Engine
-    """
-
-    def get(self, unique_id):
+    class GoogleDataStore(GameStorage):
         """
-        Returns dictionary of game state.
-        Aborts with 404 if not found
-        :param unique_id:
-        :return: GameState object
+        Storage That Uses Google Data Store Engine
         """
-        try:
-            return GoogleGameStateStore.get_by_id(unique_id).to_state()
-        except:
-            abort(404, "Game not found")
 
-    def put(self, game_state):
-        """
-        Creates a new object
-        :param value: game_state to store
-        :return: unique Identifier
-        """
-        try:
-            unique_id = uuid.uuid4().hex
-            GoogleGameStateStore.from_game_state(game_state, unique_id).put()
-            return unique_id
-        except:
-            abort(500, "Google Data Store Error")
+        def get(self, unique_id):
+            """
+            Returns dictionary of game state.
+            Aborts with 404 if not found
+            :param unique_id:
+            :return: GameState object
+            """
+            try:
+                return GoogleGameStateStore.get_by_id(unique_id).to_state()
+            except:
+                abort(404, "Game not found")
 
-    def update(self, unique_id, game_state):
-        """
-        Sets the value stored by the unique ID
-        :param unique_id: str
-        :param game_state: game_state to store
-        """
-        try:
-            GoogleGameStateStore.from_game_state(game_state, unique_id).put()
-        except:
-            abort(500, "Google Data Store Error")
+        def put(self, game_state):
+            """
+            Creates a new object
+            :param value: game_state to store
+            :return: unique Identifier
+            """
+            try:
+                unique_id = uuid.uuid4().hex
+                GoogleGameStateStore.from_game_state(game_state, unique_id).put()
+                return unique_id
+            except:
+                abort(500, "Google Data Store Error")
 
-    def get_games(self, offset, max_results, play_state):
-        """
-        Returns list of unique_id's
-        :param offset:
-        :param max_results: max number of results
-        :param play_state: whether or not the game is: in play, pending players, complete
-        :return:
-        """
-        query = GoogleGameStateStore.query(GoogleGameStateStore.game_state == play_state)
-        results = query.fetch(keys_only=True, offset=offset, limit=max_results)
-        return [x.id() for x in results], query.count()
+        def update(self, unique_id, game_state):
+            """
+            Sets the value stored by the unique ID
+            :param unique_id: str
+            :param game_state: game_state to store
+            """
+            try:
+                GoogleGameStateStore.from_game_state(game_state, unique_id).put()
+            except:
+                abort(500, "Google Data Store Error")
+
+        def get_games(self, offset, max_results, play_state):
+            """
+            Returns list of unique_id's
+            :param offset:
+            :param max_results: max number of results
+            :param play_state: whether or not the game is: in play, pending players, complete
+            :return:
+            """
+            query = GoogleGameStateStore.query(GoogleGameStateStore.game_state == play_state)
+            results = query.fetch(keys_only=True, offset=offset, limit=max_results)
+            return [x.id() for x in results], query.count()
+except:
+    pass
 
 
 def get_storage_device():
     # TODO: use environment variables to determine:
     # Prod / Local
     # Credentials For Prod
-    return GoogleDataStore()
+    if _can_import_appengine:
+        return GoogleDataStore()
+    else:
+        return RAMStore()
