@@ -1,0 +1,12 @@
+indexes:
+- kind: GoogleGameStateStore
+  ancestor: yes
+  properties:
+  - name: last_delta
+  - name: game_state
+
+
+- kind: GoogleGameStateStore
+  properties:
+  - name: game_state
+  - name: last_delta

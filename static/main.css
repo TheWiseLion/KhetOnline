@@ -79,3 +79,15 @@ md-slider.md-min[md-discrete] .md-sign {
     margin-left: auto;
     margin-right: auto;
 }
+
+th[st-sort]:before{
+    content: "\25B6";
+}
+
+.st-sort-ascent:before{
+    content: '\25B2' !important;
+}
+
+.st-sort-descent:before{
+    content: '\25BC' !important;
+}

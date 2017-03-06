@@ -1,27 +1,21 @@
+import json
 import uuid
 from abc import ABCMeta, abstractmethod
 
 import datetime
 # Support Local Static &
 from pykhet.solvers.minmax import CMinMaxSolver
+from google.cloud import datastore
 
-_can_import_appengine = False
-try:
-    from google.appengine.ext import ndb
-    _can_import = True
-except:
-    try:
-        import ndb
-    except:
-        pass
+import configs
 
-from  flask_restplus import abort
-from pykhet.components.board import KhetBoard
+_can_import_appengine = True
+
+from flask_restplus import abort
 from pykhet.components.types import TeamColor, Move, Position, Piece, MoveType
 from pykhet.games.game_types import ClassicGame, Game
 
 from enum import Enum
-from pykhet.solvers.minmax import MinmaxSolver
 
 
 class PlayState(object):
@@ -230,12 +224,11 @@ class GameState(object):
     def move_as_ai(self, color):
         solver = None
         if self.ai_level == AILevel.cake:
-            solver = CMinMaxSolver(max_evaluations=100) #~= 1 move
+            solver = CMinMaxSolver(max_evaluations=5000)  # ~= 1 move
         elif self.ai_level == AILevel.easy:
             solver = CMinMaxSolver(max_evaluations=100000)
         elif self.ai_level == AILevel.medium:
             solver = CMinMaxSolver(max_evaluations=200000)
-
 
         move = solver.get_move(self.board, color)
         return self.apply_move(move, color)
@@ -350,19 +343,13 @@ class RAMStore(GameStorage):
             abort("Offset Larger Than All Results")
         return lst[offset:min(offset + max_results, len(lst))], len(lst)
 
+
 try:
-    class GoogleGameStateStore(ndb.Model):
-        game_state = ndb.StringProperty()
-        game_data = ndb.JsonProperty()  # Potentially Useful To Compress...
 
-        @staticmethod
-        def from_game_state(game_state, game_id):
-            return GoogleGameStateStore(game_state=game_state.get_play_state(),
-                                        id=game_id,
-                                        game_data=game_state.to_dictionary())
-
-        def to_state(self):
-            return GameState.from_dictionary(self.game_data)
+    _BOARD = 'game_data'
+    _STATE = 'game_state'
+    _LAST_DELTA = 'last_delta'  #
+    _KIND = "GoogleGameStateStore"
 
 
     class GoogleDataStore(GameStorage):
@@ -370,27 +357,58 @@ try:
         Storage That Uses Google Data Store Engine
         """
 
-        def get(self, unique_id):
+        def get(self, unique_id, update_time=False):
             """
             Returns dictionary of game state.
             Aborts with 404 if not found
             :param unique_id:
+            :param update_time: update time on store
             :return: GameState object
             """
             try:
-                return GoogleGameStateStore.get_by_id(unique_id).to_state()
+                # Instantiates a client
+                datastore_client = datastore.Client(configs.PROJECT_NAME)
+
+                # The Cloud Datastore key [ The kind and name/ID for the new entity]
+                game_key = datastore_client.key(_KIND, unique_id)
+
+                # Try to get entity
+                game_board = datastore_client.get(key=game_key)
+
+                # Update Last Touched Time
+                if update_time:
+                    game_board.update(
+                        {
+                            _LAST_DELTA: datetime.datetime.utcnow()
+                        }
+                    )
+                    datastore_client.put(game_board)
+
+                return GameState.from_dictionary(json.loads(game_board[_BOARD]))
             except:
                 abort(404, "Game not found")
 
         def put(self, game_state):
             """
-            Creates a new object
+            Creates a new entity from the game state
             :param value: game_state to store
             :return: unique Identifier
             """
+
             try:
+                # Instantiates a client
+                datastore_client = datastore.Client(configs.PROJECT_NAME)
                 unique_id = uuid.uuid4().hex
-                GoogleGameStateStore.from_game_state(game_state, unique_id).put()
+                # The Cloud Datastore key [ The kind and name/ID for the new entity]
+                game_key = datastore_client.key(_KIND, unique_id)
+
+                # Board Blob can't be indexed
+                board_entity = datastore.Entity(key=game_key, exclude_from_indexes=[_BOARD])
+                board_entity[_BOARD] = json.dumps(game_state.to_dictionary())
+                board_entity[_STATE] = game_state.get_play_state()
+                board_entity[_LAST_DELTA] = datetime.datetime.utcnow()
+                datastore_client.put(board_entity)
+
                 return unique_id
             except:
                 abort(500, "Google Data Store Error")
@@ -402,21 +420,42 @@ try:
             :param game_state: game_state to store
             """
             try:
-                GoogleGameStateStore.from_game_state(game_state, unique_id).put()
+                # Instantiates a client
+                datastore_client = datastore.Client(configs.PROJECT_NAME)
+
+                # The Cloud Datastore key [ The kind and name/ID for the new entity]
+                game_key = datastore_client.key(_KIND, unique_id)
+
+                # Try to get entity
+                game_board = datastore_client.get(key=game_key)
+
+                game_board.update({
+                    _BOARD: json.dumps(game_state.to_dictionary()),
+                    _STATE: game_state.get_play_state(),
+                    _LAST_DELTA: datetime.datetime.utcnow()
+                })
+
+                datastore_client.put(game_board)
             except:
                 abort(500, "Google Data Store Error")
 
-        def get_games(self, offset, max_results, play_state):
+        def get_games(self, offset, max_results, play_state, sort_by=_LAST_DELTA):
             """
             Returns list of unique_id's
             :param offset:
             :param max_results: max number of results
             :param play_state: whether or not the game is: in play, pending players, complete
+            :param sort_by: String field to sort on. Defaults to Last Updated
             :return:
             """
-            query = GoogleGameStateStore.query(GoogleGameStateStore.game_state == play_state)
-            results = query.fetch(keys_only=True, offset=offset, limit=max_results)
-            return [x.id() for x in results], query.count()
+            datastore_client = datastore.Client(configs.PROJECT_NAME)
+            query = datastore_client.query(kind=_KIND)
+            query.add_filter(_STATE, '=', play_state)
+            query.order = sort_by
+            query.keys_only()  # return only keys
+            r = query.fetch(limit=max_results, offset=offset)
+            lst = [x.key.name for x in list(r)]
+            return lst, r.num_results
 except:
     pass
 

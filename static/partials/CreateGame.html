@@ -3,7 +3,7 @@
     <div class="form-group row">
         <label class="col-4 col-form-label">Name (optional)</label>
         <div class="col-8">
-            <input class="form-control" type="text" ng-model="ctrl.name">
+            <input class="form-control" type="text" ng-model="ctrl.name" placeholder="Name of your game...">
         </div>
     </div>
 
@@ -81,51 +81,161 @@
 <br><br><br><br>
 
 <span>
-    <h1>Find Game <md-button class="md-icon-button md-raised md-primary" aria-label="More" ng-click="ctrl.findGames()"><i class="fa fa-refresh" aria-hidden="true"></i></md-button></h1>
+    <h1>Find Game <md-button class="md-icon-button md-raised md-primary" aria-label="More" ng-click="ctrl.refresh()"><i class="fa fa-refresh" aria-hidden="true"></i></md-button></h1>
 
 </span>
 
 <p class="form-text text-muted">
-    Games below are waiting for a second player
+    Games below are waiting for a second player. Click Icon To Join.
 </p>
 
-<md-content flex layout-padding style="max-height: 400px; overflow: auto;  background: rgba(93, 87, 87, 0.71);">
-    <md-list flex>
-        <md-list-item class="md-3-line" ng-repeat="game in ctrl.pendingGames" ng-click="ctrl.joinExisting(game)">
-            <img src="static/img/horuseye.png" class="md-avatar" />
-            <div class="md-list-item-text" layout="column">
-                <h3 style="color: rgba(255, 255, 255, 0.87);">Name: {{ game.name }}</h3>
-                <h4 ng-if="game.timeLimit <= 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit }} seconds</h4>
-                <h4 ng-if="game.timeLimit > 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit/60.0 }} minutes</h4>
-                <p style="color: rgba(255, 255, 255, 0.87);">On Move {{ game.move }}</p>
-            </div>
-        </md-list-item>
-    </md-list>
-</md-content>
+
+
+<table class="table" st-pipe="ctrl.callOpenGames" st-table="ctrl.displayedOpenGames" class="table table-striped">
+    <thead>
+    <tr>
+        <th>Join</th>
+        <th>Name</th>
+        <th>Moves Made</th>
+        <th>Last Active</th>
+        <!--<th>Mode</th>-->
+    </tr>
+
+    </thead>
+    <tbody ng-show="!ctrl.isLoadingOpenGames">
+        <tr ng-repeat="row in ctrl.displayedOpenGames">
+
+            <td>
+                <button type="button" ng-click="ctrl.joinExisting(row.id)" class="btn btn-sm btn-success">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+            </button>
+            </td>
+            <td>{{row.name}}</td>
+            <td>{{row.move}}</td>
+            <td>{{row.lastActive}}</td>
+            <!--<td>{{row.mode}}</td>-->
+
+        </tr>
+    </tbody>
+
+    <tbody ng-show="ctrl.isLoadingOpenGames">
+	<tr>
+		<td colspan="4" class="text-center">Loading ... </td>
+	</tr>
+	</tbody>
+	<tfoot>
+	<tr>
+		<td class="text-center" st-pagination="" st-items-by-page="25" colspan="4">
+		</td>
+	</tr>
+	</tfoot>
+
+</table>
+
+<!--<md-content flex layout-padding style="max-height: 400px; overflow: auto;  background: rgba(93, 87, 87, 0.71);">-->
+    <!--<md-list flex>-->
+        <!--<md-list-item class="md-3-line" ng-repeat="game in ctrl.pendingGames" ng-click="ctrl.joinExisting(game)">-->
+            <!--<img src="static/img/horuseye.png" class="md-avatar" />-->
+            <!--<div class="md-list-item-text" layout="column">-->
+                <!--<h3 style="color: rgba(255, 255, 255, 0.87);">Name: {{ game.name }}</h3>-->
+                <!--<h4 ng-if="game.timeLimit <= 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit }} seconds</h4>-->
+                <!--<h4 ng-if="game.timeLimit > 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit/60.0 }} minutes</h4>-->
+                <!--<p style="color: rgba(255, 255, 255, 0.87);">On Move {{ game.move }}</p>-->
+            <!--</div>-->
+        <!--</md-list-item>-->
+    <!--</md-list>-->
+<!--</md-content>-->
 
 
 <br><br>
 <span>
-    <h1>On Going Games <md-button class="md-icon-button md-raised md-primary" aria-label="More" ng-click="ctrl.findOnGoingGames()"><i class="fa fa-refresh" aria-hidden="true"></i></md-button></h1>
-
+    <h1>On Going Games <md-button class="md-icon-button md-raised md-primary" aria-label="More" ng-click="ctrl.refresh()"><i class="fa fa-refresh" aria-hidden="true"></i></md-button></h1>
 </span>
-<p class="form-text text-muted">
-    Games below are currently in play
-</p>
+<table class="table" st-pipe="ctrl.callOnGoingGames" st-table="ctrl.displayedOnGoingGames" class="table table-striped">
+    <thead>
+    <tr>
+        <th>Join</th>
+        <th>Name</th>
+        <th>Moves Made</th>
+        <th>Last Active</th>
+        <!--<th>Mode</th>-->
+    </tr>
 
-<md-content flex layout-padding style="max-height: 400px; overflow: auto; background: rgba(93, 87, 87, 0.71);">
-    <md-list flex>
-        <md-list-item class="md-3-line" ng-repeat="game in ctrl.onGoingGames" ng-click="ctrl.joinExisting(game)">
-            <img src="static/img/ankh.png" class="md-avatar" />
-            <div class="md-list-item-text" layout="column">
-                <h3 style="color: rgba(255, 255, 255, 0.87);">Name: {{ game.name }}</h3>
-                <h4 ng-if="game.timeLimit <= 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit }} seconds</h4>
-                <h4 ng-if="game.timeLimit > 60" style="color: rgba(255, 255, 255, 0.87);">Time Limit: {{ game.timeLimit/60.0 }} minutes</h4>
-                <p style="color: rgba(255, 255, 255, 0.87);">On Move {{ game.move }}</p>
-            </div>
-        </md-list-item>
-    </md-list>
-</md-content>
+    </thead>
+    <tbody ng-show="!ctrl.isLoadingOnGoingGames">
+        <tr ng-repeat="row in ctrl.displayedOnGoingGames">
 
+            <td>
+                <button type="button" ng-click="ctrl.joinExisting(row.id)" class="btn btn-sm btn-success">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+            </button>
+            </td>
+            <td>{{row.name}}</td>
+            <td>{{row.move}}</td>
+            <td>{{row.lastActive}}</td>
+            <!--<td>{{row.mode}}</td>-->
+
+        </tr>
+    </tbody>
+
+    <tbody ng-show="ctrl.isLoadingOpenGames">
+	<tr>
+		<td colspan="4" class="text-center">Loading ... </td>
+	</tr>
+	</tbody>
+	<tfoot>
+	<tr>
+		<td class="text-center" st-pagination="" st-items-by-page="25" colspan="4">
+		</td>
+	</tr>
+	</tfoot>
+
+</table>
+
+
+<br><br>
+<span>
+    <h1>Completed Games <md-button class="md-icon-button md-raised md-primary" aria-label="More" ng-click="ctrl.refresh()"><i class="fa fa-refresh" aria-hidden="true"></i></md-button></h1>
+</span>
+<table class="table" st-pipe="ctrl.callCompletedGames" st-table="ctrl.displayedCompletedGames" class="table table-striped">
+    <thead>
+    <tr>
+        <th>View</th>
+        <th>Name</th>
+        <th>Moves Made</th>
+        <th>Last Active</th>
+        <!--<th>Mode</th>-->
+    </tr>
+
+    </thead>
+    <tbody ng-show="!ctrl.isLoadingCompletedGames">
+        <tr ng-repeat="row in ctrl.displayedCompletedGames">
+
+            <td>
+                <button type="button" ng-click="ctrl.joinExisting(row.id)" class="btn btn-sm btn-success">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+            </button>
+            </td>
+            <td>{{row.name}}</td>
+            <td>{{row.move}}</td>
+            <td>{{row.lastActive}}</td>
+            <!--<td>{{row.mode}}</td>-->
+
+        </tr>
+    </tbody>
+
+    <tbody ng-show="ctrl.isLoadingCompletedGames">
+	<tr>
+		<td colspan="4" class="text-center">Loading ... </td>
+	</tr>
+	</tbody>
+	<tfoot>
+	<tr>
+		<td class="text-center" st-pagination="" st-items-by-page="25" colspan="4">
+		</td>
+	</tr>
+	</tfoot>
+
+</table>
 
 <br><br>

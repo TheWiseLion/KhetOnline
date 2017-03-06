@@ -1,3 +1,5 @@
+import os
+
 from flask import request
 from flask import send_from_directory
 
@@ -48,10 +50,5 @@ def before_request():
         pass
 
 
-
-def main():
-    app.run(debug=api.settings.FLASK_DEBUG, port=80, threaded=True)
-
-
 if __name__ == "__main__":
-    main()
+    app.run(debug=api.settings.FLASK_DEBUG, port=80, threaded=True)

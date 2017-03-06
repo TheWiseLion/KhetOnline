@@ -13,7 +13,7 @@ from flask_restplus import fields
 from pykhet.components.types import TeamColor, Move
 from pykhet.games.game_types import ClassicGame
 
-from game.Storage import get_storage_device, GameState, Event, EventType, AILevel, PlayState
+from game.Storage import get_storage_device, GameState, Event, EventType, AILevel, PlayState, _LAST_DELTA
 
 rest_api = Api(version='1.0', title='khet-api', description='Services For Playing The Board Game Khet')
 
@@ -81,7 +81,6 @@ gameState = games.parser()
 gameState.add_argument('gameID', type=str, help='id for game')
 gameState.add_argument('countOnly', type=str, help='whether or not to only return the number events in the game',
                        default=False)
-
 
 # Post: Create Game
 # Put: Update Game With {move, forfeit}
@@ -157,6 +156,8 @@ class Games(Resource):
             else:
                 board = ClassicGame()
 
+            if name is None or len(name) is 0:
+                name = "AI: "+ai_level if not is_human else "Human Opponent"
             game = GameState(name, time_limit, board, [Event(EventType.joined, color, now)], player_mapping,
                              TeamColor.silver, TeamColor.blank, ai_level=ai_level)
 
@@ -308,8 +309,9 @@ class Authorize(Resource):
 
 search_params = games.parser()
 search_params.add_argument('offSet', type=int, help='offset', default=0)
-search_params.add_argument('gameState',  help='id for game',
-                           default=PlayState.pending, type=str)
+search_params.add_argument('gameState',  help='id for game',  default=PlayState.pending, type=str)
+search_params.add_argument('sort',  help='field to sort by',  default=_LAST_DELTA, type=str)
+
 search = rest_api.namespace('search', description='Find Open Games')
 # enum=[PlayState.pending, PlayState.complete, PlayState.playing],
 
@@ -331,16 +333,3 @@ class Search(Resource):
             "games": matching_games
         }
 
-# Store Game References
-# Create New Game {Multiplayer[time-limit], AI}
-# Modify Game {Make Move, Quit/Forfeit, ??}
-# Get Game State
-
-
-# AI Play:
-# Choose color
-# Unique Link. Anyone can make move
-
-# Human Play:
-# Time limit
-# First two players to join

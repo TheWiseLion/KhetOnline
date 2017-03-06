@@ -1,5 +1,33 @@
 (function () {
 
+    function timeSince(date) {
+
+        var seconds = Math.floor((new Date() - date) / 1000);
+
+        var interval = Math.floor(seconds / 31536000);
+
+        if (interval > 1) {
+            return interval + " years ago";
+        }
+        interval = Math.floor(seconds / 2592000);
+        if (interval > 1) {
+            return interval + " months ago";
+        }
+        interval = Math.floor(seconds / 86400);
+        if (interval > 1) {
+            return interval + " days ago";
+        }
+        interval = Math.floor(seconds / 3600);
+        if (interval > 1) {
+            return interval + " hours ago";
+        }
+        interval = Math.floor(seconds / 60);
+        if (interval > 1) {
+            return interval + " minutes ago";
+        }
+        return Math.floor(seconds) + " seconds ago";
+}
+
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
@@ -20,7 +48,7 @@ function DialogController($scope, $mdDialog) {
 }
 
 // Routes -> Create / About / Play / Statistics
-var app = angular.module("myApp", ["ngRoute","ngMaterial", 'ngCookies']);
+var app = angular.module("myApp", ["ngRoute","ngMaterial", 'ngCookies','smart-table']);
 app.config(function($routeProvider) {
     $routeProvider.when("/how-to-play", {
         templateUrl : "static/partials/HowToPlay.html",
@@ -248,16 +276,46 @@ app.factory('khetService', function ($q, $http,$location, $cookies, $mdDialog, $
         return deferred.promise;
     };
 
-    service.findGames = function(gameState){
+    service.findGames = function(gameState, offset, limit){
         var deferred = $q.defer();
         gameState = (gameState == undefined) ? "pending" : gameState;
+        offset = (offset == undefined) ? 0 : offset;
+        limit = (limit == undefined) ? 25 : limit;
+
         $http({
             method: 'GET',
-            url: base+"search?gameState="+gameState
+            url: base+"search?gameState="+gameState+'&offset='+offset+"&limit="+limit
         }).then(function successCallback(response) {
-            // this callback will be called asynchronously
-            // when the response is available
-            deferred.resolve(response.data.games);
+            // Returns game ID's then make calls following each game details...
+            var gameIds = response.data.games;
+            var cnt = 0;
+            var required = gameIds.length;
+            var games = [];
+            gameIds.forEach(function (e) {
+                service.getGame(e).then(function (game_stats) {
+                    var gname = (game_stats.name==null || game_stats.name.length==0)? "-Not Named-":game_stats.name;
+                    games.push({name: gname,
+                        timeLimit: game_stats.timeLimit,
+                        move: game_stats.events.length,
+                        id: e,
+                        mode: game_stats.mode,
+                        lastActive: timeSince(new Date(game_stats.events[game_stats.events.length-1].time))
+                    });
+
+                    //Do some logic so you only switch lists when all queries are done....
+                    //If this isn't done you get annoying jitter
+                    cnt += 1;
+                    if(cnt == required){
+                        deferred.resolve(
+                            {
+                                games: games,
+                                total: response.data.size
+                            }
+                        );
+                    }
+
+                });
+            });
         }, function errorCallback(response) {});
         return deferred.promise;
     };
@@ -267,7 +325,7 @@ app.factory('khetService', function ($q, $http,$location, $cookies, $mdDialog, $
 });
 
 // Create Controller
-app.controller('CreateCtrl', function CreateCtrl(khetService, $window, $timeout, $mdDialog, $interval) {
+app.controller('CreateCtrl', function CreateCtrl(khetService, $window, $timeout, $mdDialog, $interval,$scope,$route) {
     console.log("New Create Ctrl");
     var ctrl = {};
     ctrl.mode = "classic";
@@ -290,6 +348,9 @@ app.controller('CreateCtrl', function CreateCtrl(khetService, $window, $timeout,
     };
 
 
+
+
+
     ctrl.joinGame = function(){
         var id = ctrl.gameID;
         if (id > 0){
@@ -303,63 +364,65 @@ app.controller('CreateCtrl', function CreateCtrl(khetService, $window, $timeout,
 
     ctrl.joinExisting = function(game){
         console.log("clicked");
-        $window.location.href = '/#!/play?gameID='+encodeURI(game.id);
+        $window.location.href = '/#!/play?gameID='+encodeURI(game);
         $window.location.reload();
     };
 
-    ctrl.pendingGames = [];
-    ctrl.onGoingGames = [];
-    ctrl.findGames = function () {
-        var cnt = 0;
-        var required = 1;
-        var new_games = [];
-        khetService.findGames().then(function (gameIds) {
-            cnt += 1;
-            required += gameIds.length;
-            gameIds.forEach(function (e) {
-                khetService.getGame(e).then(function (game_stats) {
-                    var gname = (game_stats.name==null || game_stats.name.length==0)? "-Not Named-":game_stats.name;
-                    new_games.push({name: gname, timeLimit: game_stats.timeLimit, move: game_stats.events.length, id: e});
+    ctrl.displayedOpenGames = [];
+    ctrl.isLoadingOpenGames = false;
+    ctrl.callOpenGames = function callServer(tableState) {
+        ctrl.isLoadingOpenGames = true;
 
-                    //Do some logic so you only switch lists when all queries are done....
-                    //If this isn't done you get annoying jitter
-                    cnt += 1;
-                    if(cnt == required){
-                        ctrl.pendingGames = new_games;
-                    }
+        var pagination = tableState.pagination;
 
-                });
-            });
+        var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
+        var number = pagination.number || 25;  // Number of entries showed per page.
+
+        khetService.findGames('pending',start, number).then(function (result) {
+          ctrl.displayedOpenGames = result.games;
+          tableState.pagination.numberOfPages = result.total/25;//set the number of pages so the pagination can update
+          ctrl.isLoadingOpenGames = false;
         });
     };
 
-    ctrl.findOnGoingGames = function () {
-        var cnt = 0;
-        var required = 1;
-        var new_games = [];
-        khetService.findGames("playing").then(function (gameIds) {
-            cnt += 1;
-            required += gameIds.length;
-            gameIds.forEach(function (e) {
-                khetService.getGame(e).then(function (game_stats) {
-                    var gname = (game_stats.name==null || game_stats.name.length==0)? "-Not Named-":game_stats.name;
-                    new_games.push({name: gname, timeLimit: game_stats.timeLimit, move: game_stats.events.length, id: e});
+    ctrl.displayedOnGoingGames = [];
+    ctrl.isLoadingOnGoingGames = false;
+    ctrl.callOnGoingGames = function callServer(tableState) {
+        ctrl.isLoadingOnGoingGames = true;
 
-                    //Do some logic so you only switch lists when all queries are done....
-                    //If this isn't done you get annoying jitter
-                    cnt += 1;
-                    if(cnt == required){
-                        ctrl.onGoingGames = new_games;
-                    }
+        var pagination = tableState.pagination;
 
-                });
-            });
+        var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
+        var number = pagination.number || 25;  // Number of entries showed per page.
+
+        khetService.findGames('playing',start, number).then(function (result) {
+          ctrl.displayedOnGoingGames = result.games;
+          tableState.pagination.numberOfPages = result.total/25;//set the number of pages so the pagination can update
+          ctrl.isLoadingOnGoingGames = false;
         });
     };
 
+    ctrl.displayedCompletedGames = [];
+    ctrl.isLoadingCompletedGames = false;
+    ctrl.callCompletedGames = function callServer(tableState) {
+        ctrl.isLoadingCompletedGames = true;
 
-    ctrl.findOnGoingGames();
-    ctrl.findGames();
+        var pagination = tableState.pagination;
+
+        var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
+        var number = pagination.number || 25;  // Number of entries showed per page.
+
+        khetService.findGames('complete',start, number).then(function (result) {
+          ctrl.displayedCompletedGames = result.games;
+          tableState.pagination.numberOfPages = result.total/25;//set the number of pages so the pagination can update
+          ctrl.isLoadingCompletedGames = false;
+        });
+    };
+
+    ctrl.refresh = function () {
+        $route.reload();
+    };
+
     return ctrl;
 });
 
